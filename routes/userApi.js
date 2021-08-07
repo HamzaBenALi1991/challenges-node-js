@@ -5,10 +5,11 @@ const User = require('../models/userSchema');
 
 
 // get all users 
-router.get('users', async (req,res)=>{
+router.get('/users', async (req,res)=>{
     try {
-        const users = await User.find({});
+        const users = await User.find({}).populate("todos" ,"title"); 
         res.json(users);
+
       } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal server error!" });
@@ -56,5 +57,32 @@ router.put("/users/:id", async (req, res) => {
       res.status(500).json({ message: "Internal server error!" });
     }
   });
+  // affect todo to user 
+  router.put('/affect-todo/:iduser/:idtodo',async(req,res)=>{
+    try {
+      const user = await User.findByIdAndUpdate(req.params.iduser, {$push:{todos :req.params.idtodo}}, {
+        new: true,
+      });
+      res.json(user);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Internal server error!" });
+    }
+  });
+  
+  // desafecte todo from user 
+  router.put('/desaffect-todo/:iduser/:idtodo',async(req,res)=>{
+    try {
+      const user = await User.findByIdAndUpdate(req.params.iduser, {$pull:{todos :req.params.idtodo}}, {
+        new: true,
+      });
+      res.json(user);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Internal server error!" });
+    }
+  });
+
+  
  
 module.exports = router;
